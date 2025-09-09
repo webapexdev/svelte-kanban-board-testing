@@ -3,6 +3,7 @@ import { tasks } from '$lib/server/db';
 import type { RequestHandler } from './$types';
 import fs from 'fs';
 import path from 'path';
+import type { TaskStatus } from '$lib/types/types';
 
 export const GET: RequestHandler = async ({ params }) => {
   const task = tasks.find(t => t.id === params.id);
@@ -19,6 +20,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
   const title = form.get('title') as string;
   const description = form.get('description') as string | null;
   const due_date = form.get('due_date') as string | null;
+  const status = form.get('status') as TaskStatus | null;
   const file = form.get('photo') as File | null;
 
   let photo = tasks[idx].photo; // keep existing photo if not replaced
@@ -36,13 +38,16 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 
   tasks[idx] = {
     ...tasks[idx],
-    title,
-    description: description || undefined,
-    due_date: due_date || undefined,
+    title: title && title.trim() !== '' ? title : tasks[idx].title,
+    description:
+      description && description.trim() !== ''
+        ? description
+        : tasks[idx].description,
+    due_date: due_date && due_date.trim() !== '' ? due_date : tasks[idx].due_date,
+    status: status && status.trim() !== '' ? status : tasks[idx].status,
     photo,
     updated_at: new Date().toISOString()
   };
-
   return json(tasks[idx]);
 };
 

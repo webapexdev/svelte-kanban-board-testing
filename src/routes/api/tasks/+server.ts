@@ -5,8 +5,6 @@ import fs from 'fs';
 import path from 'path';
 import { randomUUID } from 'crypto';
 
-export const GET: RequestHandler = async () => json(tasks);
-
 export const POST: RequestHandler = async ({ request }) => {
   const form = await request.formData();
   const title = form.get('title') as string;
@@ -41,4 +39,34 @@ export const POST: RequestHandler = async ({ request }) => {
 
   tasks.push(task);
   return json(task, { status: 201 });
+};
+
+export const GET: RequestHandler = async ({ url }) => {
+  try {
+    const status = url.searchParams.get('status');
+    const q = url.searchParams.get('q');
+
+    let filtered = tasks;
+
+    if (status && ['todo', 'in-progress', 'done'].includes(status)) {
+      filtered = filtered.filter((t) => t.status === status);
+    }
+
+    if (q && q.trim() !== '') {
+      const query = q.toLowerCase();
+      filtered = filtered.filter((t) => {
+        const title = t.title ?? '';
+        const description = t.description ?? '';
+        return (
+          title.toLowerCase().includes(query) ||
+          description.toLowerCase().includes(query)
+        );
+      });
+    }
+
+    return json(filtered);
+  } catch (err) {
+    console.error('Error in GET /api/tasks:', err);
+    return json({ error: 'Internal Server Error' }, { status: 500 });
+  }
 };

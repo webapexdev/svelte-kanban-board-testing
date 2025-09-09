@@ -6,14 +6,19 @@
 	import Plus from 'lucide-svelte/icons/plus';
 	import List from 'lucide-svelte/icons/list';
 	import LayoutKanban from 'lucide-svelte/icons/kanban';
+	import TaskFilter from '$lib/components/TaskFilter.svelte';
 
 	let tasks: Task[] = [];
 	let nearest: Task | null = null;
 	let view: ViewMode = 'list';
 	let draggingId: string | null = null;
+	let filter = { status: '', q: '' };
 
 	async function load() {
-		const resTasks = await fetch('/api/tasks/');
+		const params = new URLSearchParams();
+		if (filter.status) params.set('status', filter.status);
+		if (filter.q) params.set('q', filter.q);
+		const resTasks = await fetch(`/api/tasks?${params}`);
 		tasks = await resTasks.json();
 		const resNearest = await fetch('/api/tasks/nearest-deadline/');
 		nearest = await resNearest.json();
@@ -38,9 +43,8 @@
 		}
 	}
 
-	function handleClick(e: CustomEvent<string>) {
-		const label = e.detail;
-		switch (label) {
+	function handleClick(role: string) {
+		switch (role) {
 			case 'List':
 				view = 'list';
 				break;
@@ -54,6 +58,11 @@
 		}
 	}
 
+	function handleFilterChange(e: CustomEvent<{ status: string; q: string }>) {
+		filter = e.detail;
+		load();
+	}
+
 	onMount(load);
 </script>
 
@@ -61,13 +70,14 @@
 	<div class="flex items-center justify-between">
 		<h1 class="text-2xl font-bold">Dashboard</h1>
 		<div class="flex items-center gap-2">
-			<Button label="Add Task" color="blue" on:click={handleClick}>
+			<TaskFilter status={filter.status} q={filter.q} on:change={handleFilterChange} />
+			<Button label="Add Task" color="blue" on:click={() => handleClick('Add Task')}>
 				<Plus class="h-5 w-5" />
 			</Button>
-			<Button label="List" color="green" showLabel={false} on:click={handleClick}>
+			<Button color="green" on:click={() => handleClick('List')}>
 				<List class="h-5 w-5" />
 			</Button>
-			<Button label="Kanban" color="red" showLabel={false} on:click={handleClick}>
+			<Button color="red" on:click={() => handleClick('Kanban')}>
 				<LayoutKanban class="h-5 w-5" />
 			</Button>
 		</div>

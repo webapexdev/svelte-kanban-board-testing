@@ -1,9 +1,8 @@
 <script lang="ts">
 	import type { Color } from '$lib/types/types';
 	import { createEventDispatcher } from 'svelte';
-	export let label: string = 'Click me';
+	export let label: string = '';
 	export let color: Color = 'gray';
-	export let showLabel: boolean = true;
 
 	const dispatch = createEventDispatcher<{ click: string }>();
 
@@ -24,7 +23,7 @@
 		on:click={handleClick}
 		class={`cursor-pointer rounded px-3 py-1 transition ${colorClasses[color]} line-height-0 flex h-10 items-center gap-2 border-0 focus:ring-2 focus:ring-offset-2 focus:outline-none focus:ring-${color}-500`}
 	>
-		{#if showLabel}
+		{#if label}
 			<span class="flex items-center">{label}</span>
 		{/if}
 		<slot />
