@@ -67,19 +67,21 @@
 </script>
 
 <div class="flex h-screen flex-col space-y-6 p-6">
-	<div class="flex items-center justify-between">
+	<div class="flex flex-wrap items-center justify-between gap-4">
 		<h1 class="text-2xl font-bold">Dashboard</h1>
-		<div class="flex items-center gap-2">
+		<div class="flex flex-wrap items-center gap-4">
 			<TaskFilter status={filter.status} q={filter.q} on:change={handleFilterChange} />
-			<Button label="Add Task" color="blue" on:click={() => handleClick('Add Task')}>
-				<Plus class="h-5 w-5" />
-			</Button>
-			<Button color="green" on:click={() => handleClick('List')}>
-				<List class="h-5 w-5" />
-			</Button>
-			<Button color="red" on:click={() => handleClick('Kanban')}>
-				<LayoutKanban class="h-5 w-5" />
-			</Button>
+			<div class="flex items-center gap-2">
+				<Button label="Add Task" color="blue" on:click={() => handleClick('Add Task')}>
+					<Plus class="h-5 w-5" />
+				</Button>
+				<Button color="green" on:click={() => handleClick('List')}>
+					<List class="h-5 w-5" />
+				</Button>
+				<Button color="red" on:click={() => handleClick('Kanban')}>
+					<LayoutKanban class="h-5 w-5" />
+				</Button>
+			</div>
 		</div>
 	</div>
 
@@ -106,8 +108,8 @@
 			{/each}
 		</div>
 	{:else}
-		<div class="mt-4 flex-1 overflow-hidden">
-			<div class="grid h-full grid-cols-3 gap-4">
+		<div class="mt-4 flex-1">
+			<div class="grid h-full grid-cols-1 gap-4 md:grid-cols-3">
 				{#each ['todo', 'in-progress', 'done'] as colTyped}
 					<Column
 						col={colTyped as ColumnLabel}
