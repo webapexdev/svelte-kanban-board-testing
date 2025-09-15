@@ -9,27 +9,44 @@
 	import Trash from 'lucide-svelte/icons/trash-2';
 	import TaskForm from '$lib/components/TaskForm.svelte';
 
-	let task: any = null;
+	type TaskType = {
+		id: string;
+		title: string;
+		description?: string;
+		due_date?: string;
+		photo?: string;
+		status?: string;
+	};
+
+	let task: TaskType | null = null;
 	let editing = false;
 	let deleting = false;
+
+	// Form fields
 	let title = '';
 	let description = '';
 	let due_date = '';
-	let photo: File | null = null;
+	let photo: string | null = null;
 
 	async function load() {
 		const res = await fetch(`/api/tasks/${$page.params.id}`);
+		if (!res.ok) {
+			// handle fetch error
+			console.error('Failed to load task');
+			return;
+		}
 		task = await res.json();
 		title = task.title;
 		description = task.description || '';
-		// existing photo is stored in DB as URL, not as File
-		photo = null;
 		due_date = task.due_date || '';
+		photo = task.photo || null;
 	}
 
 	async function handleDelete() {
-		await fetch(`/api/tasks/${task.id}`, { method: 'DELETE' });
-		goto('/');
+		if (!task) return;
+		const res = await fetch(`/api/tasks/${task.id}`, { method: 'DELETE' });
+		if (res.ok) goto('/');
+		else console.error('Failed to delete task');
 	}
 
 	onMount(load);
@@ -39,19 +56,17 @@
 	<div class="mx-auto mt-20 flex min-h-[400px] max-w-lg flex-col p-6">
 		<div class="flex-1 space-y-4">
 			{#if editing}
-				<div class="space-y-4">
-					<TaskForm
-						{title}
-						{description}
-						{due_date}
-						photo={task.photo}
-						mode="edit"
-						id={task.id}
-						oncancel={() => (editing = false)}
-					/>
-				</div>
+				<TaskForm
+					{title}
+					{description}
+					{due_date}
+					photo={task.photo}
+					mode="edit"
+					id={task.id}
+					oncancel={() => (editing = false)}
+				/>
 			{:else}
-				<div class="flex w-full justify-between">
+				<div class="flex w-full items-center justify-between">
 					<h1 class="text-2xl font-bold">{task.title}</h1>
 					<Button label="Go to Dashboard" color="gray" on:click={() => goto('/')}>
 						<ArrowRight class="h-6 w-6 text-gray-600" />
@@ -62,15 +77,14 @@
 					<p class="text-sm text-gray-500">Due: {task.due_date}</p>
 				{/if}
 
-				<p>{task.description}</p>
+				<p class="text-gray-700">{task.description}</p>
 
 				{#if task.photo}
-					<img src={task.photo} alt="attachment" class="mt-2 rounded" />
+					<img src={task.photo} alt="attachment" class="mt-2 max-h-60 rounded object-contain" />
 				{/if}
 			{/if}
 		</div>
 
-		<!-- Button group always at bottom -->
 		{#if !editing}
 			<div class="mt-6 flex justify-between border-t pt-4">
 				<Button label="Edit" color="blue" on:click={() => (editing = true)}>

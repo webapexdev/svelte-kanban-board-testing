@@ -14,36 +14,41 @@
 	let draggingId: string | null = null;
 	let filter = { status: '', q: '' };
 
-	async function load() {
+	/** Load tasks and nearest deadline from API */
+	async function load(): Promise<void> {
 		const params = new URLSearchParams();
 		if (filter.status) params.set('status', filter.status);
 		if (filter.q) params.set('q', filter.q);
-		const resTasks = await fetch(`/api/tasks?${params}`);
+
+		const [resTasks, resNearest] = await Promise.all([
+			fetch(`/api/tasks?${params}`),
+			fetch('/api/tasks/nearest-deadline/')
+		]);
+
 		tasks = await resTasks.json();
-		const resNearest = await fetch('/api/tasks/nearest-deadline/');
 		nearest = await resNearest.json();
 	}
 
-	async function moveTask(id: string, status: Task['status']) {
+	/** Update task status and send to server */
+	async function moveTask(id: string, status: Task['status']): Promise<void> {
 		const idx = tasks.findIndex((t) => t.id === id);
 		if (idx === -1) return;
+
 		const old = tasks[idx];
 		tasks[idx] = { ...old, status };
+
 		try {
 			const fd = new FormData();
 			fd.append('status', status);
-
-			await fetch(`/api/tasks/${id}`, {
-				method: 'PUT',
-				body: fd
-			});
-		} catch (e) {
-			// rollback if request fails
+			await fetch(`/api/tasks/${id}`, { method: 'PUT', body: fd });
+		} catch {
+			// Rollback if request fails
 			tasks[idx] = old;
 		}
 	}
 
-	function handleClick(role: string) {
+	/** Handle view or navigation actions */
+	function handleClick(role: 'List' | 'Kanban' | 'Add Task'): void {
 		switch (role) {
 			case 'List':
 				view = 'list';
@@ -52,7 +57,6 @@
 				view = 'kanban';
 				break;
 			case 'Add Task':
-				// Navigate to add task page
 				window.location.href = '/task/new';
 				break;
 		}
@@ -67,7 +71,7 @@
 </script>
 
 <div class="flex h-screen flex-col space-y-6 p-6">
-	<div class="flex flex-wrap items-center justify-between gap-4">
+	<header class="flex flex-wrap items-center justify-between gap-4">
 		<h1 class="text-2xl font-bold">Dashboard</h1>
 		<div class="flex flex-wrap items-center gap-4">
 			<TaskFilter status={filter.status} q={filter.q} on:change={handleFilterChange} />
@@ -83,9 +87,9 @@
 				</Button>
 			</div>
 		</div>
-	</div>
+	</header>
 
-	{#if nearest && nearest.title}
+	{#if nearest?.title}
 		<div class="mt-4 rounded-xl bg-yellow-100 p-4 shadow">
 			<h2 class="font-semibold">Nearest deadline:</h2>
 			<p>{nearest.title} (due {nearest.due_date})</p>

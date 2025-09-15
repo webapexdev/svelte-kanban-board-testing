@@ -5,6 +5,13 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 
+	server: {
+		host: true, // allows access from network IPs (not just localhost)
+		port: 5173, // you can change if needed
+		strictPort: true, // ensures Vite sticks to this port
+		proxy: {}, // in case you need to bypass VPN routing for APIs
+	},
+
 	test: {
 		projects: [
 			{
@@ -13,18 +20,11 @@ export default defineConfig({
 				test: {
 					name: 'client',
 					environment: 'browser',
-					// Timeout for browser tests - prevent hanging on element lookups
 					testTimeout: 2000,
 					browser: {
 						enabled: true,
 						provider: 'playwright',
-						// Multiple browser instances for better performance
-						// Uses single Vite server with shared caching
-						instances: [
-							{ browser: 'chromium' },
-							// { browser: 'firefox' },
-							// { browser: 'webkit' },
-						],
+						instances: [{ browser: 'chromium' }],
 					},
 					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
 					exclude: [
@@ -35,7 +35,7 @@ export default defineConfig({
 				},
 			},
 			{
-				// SSR tests (Server-side rendering)
+				// SSR tests
 				extends: true,
 				test: {
 					name: 'ssr',
@@ -44,7 +44,7 @@ export default defineConfig({
 				},
 			},
 			{
-				// Server-side tests (Node.js utilities)
+				// Server-side tests
 				extends: true,
 				test: {
 					name: 'server',
@@ -59,8 +59,6 @@ export default defineConfig({
 		],
 		coverage: {
 			include: ['src'],
-			// Improved performance: Vitest only checks files in src/
-			// instead of scanning the entire project
 		},
 	},
 });

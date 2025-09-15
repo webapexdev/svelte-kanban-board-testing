@@ -5,12 +5,12 @@
 	import { TaskInputSchema } from '$lib/schemas/task';
 	import Save from 'lucide-svelte/icons/save';
 
-	export let id = '';
-	export let title = '';
-	export let description = '';
-	export let due_date = '';
+	export let id: string = '';
+	export let title: string = '';
+	export let description: string = '';
+	export let due_date: string = '';
 	export let photo: string = '';
-	export let mode: 'new' | 'edit' = 'new'; // to differentiate between new and edit mode
+	export let mode: 'new' | 'edit' = 'new';
 	export let oncancel: () => void = () => {};
 
 	let newPhoto: File | null = null;
@@ -22,6 +22,7 @@
 
 	async function submit() {
 		errors = {};
+
 		const result = TaskInputSchema.safeParse({ title, description });
 
 		if (!result.success) {
@@ -32,60 +33,75 @@
 			return;
 		}
 
+		console.log('new photo', newPhoto);
 		const fd = new FormData();
 		fd.append('title', title);
 		if (description) fd.append('description', description);
 		if (due_date) fd.append('due_date', due_date);
 		if (newPhoto) fd.append('photo', newPhoto);
-		if (mode === 'new') {
-			await fetch('/api/tasks/', { method: 'POST', body: fd });
-		} else {
-			await fetch(`/api/tasks/${id}`, {
-				method: 'PUT',
-				body: fd
-			});
-		}
+
+		const url = mode === 'new' ? '/api/tasks/' : `/api/tasks/${id}`;
+		const method = mode === 'new' ? 'POST' : 'PUT';
+
+		await fetch(url, { method, body: fd });
 		goto('/');
 	}
 </script>
 
 <div class="mx-auto mt-10 max-w-lg space-y-4">
 	<div class="mt-2">
-		<label for="title" class="mb-1 block text-sm font-medium text-gray-700"> Title </label>
-		<input class="w-full rounded border p-2" placeholder="Title" bind:value={title} />
+		<label for="title" class="mb-1 block text-sm font-medium text-gray-700">Title</label>
+		<input
+			id="title"
+			type="text"
+			class="w-full rounded border p-2 focus:ring focus:ring-blue-200"
+			placeholder="Title"
+			bind:value={title}
+			aria-invalid={!!errors.title}
+			aria-describedby="title-error"
+		/>
 		{#if errors.title}
-			<p class="text-sm text-red-500">{errors.title}</p>
+			<p id="title-error" class="text-sm text-red-500">{errors.title}</p>
 		{/if}
 	</div>
+
 	<div class="mt-2">
-		<label for="description" class="mb-1 block text-sm font-medium text-gray-700">
-			Description
-		</label>
+		<label for="description" class="mb-1 block text-sm font-medium text-gray-700">Description</label
+		>
 		<textarea
-			class="w-full rounded border p-2"
+			id="description"
+			class="w-full rounded border p-2 focus:ring focus:ring-blue-200"
 			placeholder="Description"
 			rows={5}
 			bind:value={description}
+			aria-invalid={!!errors.description}
+			aria-describedby="description-error"
 		></textarea>
 		{#if errors.description}
-			<p class="text-sm text-red-500">{errors.description}</p>
+			<p id="description-error" class="text-sm text-red-500">{errors.description}</p>
 		{/if}
 	</div>
+
 	<div class="mt-2">
-		<label for="due_date" class="mb-1 block text-sm font-medium text-gray-700"> due date </label>
-		<input type="date" class="w-full rounded border p-2" bind:value={due_date} />
+		<label for="due_date" class="mb-1 block text-sm font-medium text-gray-700">Due Date</label>
+		<input
+			id="due_date"
+			type="date"
+			class="w-full rounded border p-2 focus:ring focus:ring-blue-200"
+			bind:value={due_date}
+		/>
 	</div>
 
-	<!-- show existing photo if user hasn’t selected new one -->
 	{#if photo && !newPhoto}
 		<div>
-			<label class="mb-1 block text-sm font-medium text-gray-700"> Attachment </label>
+			<label class="mb-1 block text-sm font-medium text-gray-700">Attachment</label>
 			<img src={photo} alt="attachment" class="max-h-40 rounded" />
 		</div>
 	{/if}
+
 	<div class="mt-2 flex w-full items-center justify-between">
 		<FileUploader on:change={(e: CustomEvent<File | null>) => handleFileChange(e.detail)} />
-		<div>
+		<div class="flex gap-2">
 			{#if mode === 'edit'}
 				<Button label="Cancel" color="gray" on:click={oncancel} />
 			{/if}
