@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { fetchTaskById, updateTask, deleteTask } from '$lib/stores/tasks';
 	import Button from '$lib/components/Button.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import ArrowRight from 'lucide-svelte/icons/arrow-right';
@@ -9,44 +10,23 @@
 	import Trash from 'lucide-svelte/icons/trash-2';
 	import TaskForm from '$lib/components/TaskForm.svelte';
 
-	type TaskType = {
-		id: string;
-		title: string;
-		description?: string;
-		due_date?: string;
-		photo?: string;
-		status?: string;
-	};
-
-	let task: TaskType | null = null;
-	let editing = false;
-	let deleting = false;
-
-	// Form fields
-	let title = '';
-	let description = '';
-	let due_date = '';
-	let photo: string | null = null;
+	let task: any = null;
+	let editing: boolean = false;
+	let deleting: boolean = false;
 
 	async function load() {
-		const res = await fetch(`/api/tasks/${$page.params.id}`);
-		if (!res.ok) {
-			// handle fetch error
-			console.error('Failed to load task');
-			return;
+		const id = $page.params.id;
+		if (typeof id === 'string') {
+			task = await fetchTaskById(id);
+		} else {
+			task = null;
 		}
-		task = await res.json();
-		title = task.title;
-		description = task.description || '';
-		due_date = task.due_date || '';
-		photo = task.photo || null;
 	}
 
 	async function handleDelete() {
 		if (!task) return;
-		const res = await fetch(`/api/tasks/${task.id}`, { method: 'DELETE' });
-		if (res.ok) goto('/');
-		else console.error('Failed to delete task');
+		await deleteTask(task.id);
+		goto('/');
 	}
 
 	onMount(load);
@@ -57,9 +37,9 @@
 		<div class="flex-1 space-y-4">
 			{#if editing}
 				<TaskForm
-					{title}
-					{description}
-					{due_date}
+					title={task.title}
+					description={task.description}
+					due_date={task.due_date}
 					photo={task.photo}
 					mode="edit"
 					id={task.id}
@@ -97,7 +77,7 @@
 		{/if}
 	</div>
 
-	<Modal open={deleting} title="Confirm Delete" onClose={() => (deleting = false)}>
+	<Modal open={deleting} title="Confirm Delete" on:close={() => (deleting = false)}>
 		<p class="mb-4 text-gray-700">
 			Are you sure you want to delete <span class="font-semibold">{task.title}</span>? This action
 			cannot be undone.

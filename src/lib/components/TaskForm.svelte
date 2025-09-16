@@ -4,6 +4,7 @@
 	import FileUploader from '$lib/components/FileUploader.svelte';
 	import { TaskInputSchema } from '$lib/schemas/task';
 	import Save from 'lucide-svelte/icons/save';
+	import { createTask, updateTask } from '$lib/stores/tasks';
 
 	export let id: string = '';
 	export let title: string = '';
@@ -33,17 +34,18 @@
 			return;
 		}
 
-		console.log('new photo', newPhoto);
 		const fd = new FormData();
 		fd.append('title', title);
 		if (description) fd.append('description', description);
 		if (due_date) fd.append('due_date', due_date);
 		if (newPhoto) fd.append('photo', newPhoto);
 
-		const url = mode === 'new' ? '/api/tasks/' : `/api/tasks/${id}`;
-		const method = mode === 'new' ? 'POST' : 'PUT';
+		if (mode === 'new') {
+			await createTask(fd);
+		} else {
+			await updateTask(id, fd);
+		}
 
-		await fetch(url, { method, body: fd });
 		goto('/');
 	}
 </script>
