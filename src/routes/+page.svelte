@@ -10,7 +10,6 @@
 	import { filter } from '$lib/stores/filter';
 	import type { ColumnLabel, ViewMode } from '$lib/types/types';
 	import Loading from '$lib/components/Loading.svelte';
-	import { withLoading } from '$lib/stores/ui';
 
 	let view: ViewMode = 'list';
 	let draggingId: string | null = null;
@@ -54,7 +53,7 @@
 		filter.set(initial);
 
 		// fetch tasks based on parsed filter
-		withLoading(fetchTasks(initial));
+		fetchTasks(initial);
 	});
 </script>
 
