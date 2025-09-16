@@ -1,5 +1,6 @@
 // UI states (loading, modals, etc.)
 import { writable } from "svelte/store";
+import type { ViewMode } from '$lib/types/types';
 
 export const globalLoading = writable(false);
 export const globalError = writable<string | null>(null);
@@ -28,3 +29,15 @@ export async function withLoading<T>(promise: Promise<T>) {
         loading.set(false);
     }
 }
+
+// Default is "list"
+const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('viewMode') : null;
+
+export const viewMode = writable<ViewMode>((saved as ViewMode) || 'list');
+
+// Persist changes in localStorage
+viewMode.subscribe((val) => {
+    if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('viewMode', val);
+    }
+});

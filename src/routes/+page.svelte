@@ -10,17 +10,17 @@
 	import { filter } from '$lib/stores/filter';
 	import type { ColumnLabel, ViewMode } from '$lib/types/types';
 	import Loading from '$lib/components/Loading.svelte';
+	import { viewMode } from '$lib/stores/ui';
 
-	let view: ViewMode = 'list';
 	let draggingId: string | null = null;
 
 	function handleClick(role: string) {
 		switch (role) {
 			case 'List':
-				view = 'list';
+				viewMode.set('list');
 				break;
 			case 'Kanban':
-				view = 'kanban';
+				viewMode.set('kanban');
 				break;
 			case 'Add Task':
 				window.location.href = '/task/new';
@@ -85,7 +85,7 @@
 		</div>
 	{/if}
 
-	{#if view === 'list'}
+	{#if $viewMode === 'list'}
 		<div class="mt-4 grid gap-4">
 			{#each $tasks as t}
 				<div class="rounded border border-gray-200 bg-white p-4 shadow">
