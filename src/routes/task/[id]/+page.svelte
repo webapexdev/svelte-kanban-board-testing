@@ -33,7 +33,9 @@
 </script>
 
 {#if task}
-	<div class="mx-auto mt-20 flex min-h-[400px] max-w-lg flex-col p-6">
+	<div
+		class="mx-auto mt-20 flex min-h-[400px] max-w-lg flex-col rounded-lg bg-gray-200 p-6 shadow-lg"
+	>
 		<div class="flex-1 space-y-4">
 			{#if editing}
 				<TaskForm

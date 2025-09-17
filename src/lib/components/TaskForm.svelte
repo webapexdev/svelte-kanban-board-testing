@@ -50,7 +50,7 @@
 	}
 </script>
 
-<div class="mx-auto mt-10 max-w-lg space-y-4">
+<div class="mx-auto mt-10 max-w-lg space-y-4 rounded-lg bg-gray-400 p-6 shadow-lg">
 	<div class="mt-2">
 		<label for="title" class="mb-1 block text-sm font-medium text-gray-700">Title</label>
 		<input

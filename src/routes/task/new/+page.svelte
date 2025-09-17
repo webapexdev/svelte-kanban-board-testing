@@ -5,7 +5,7 @@
 	import ArrowRight from 'lucide-svelte/icons/arrow-right';
 </script>
 
-<div class="mx-auto mt-10 max-w-lg space-y-6 p-6">
+<div class="mx-auto mt-10 max-w-lg space-y-6 rounded-lg bg-gray-200 p-6 shadow-lg">
 	<header class="flex w-full items-center justify-between">
 		<h1 class="text-2xl font-bold">New Task</h1>
 		<Button label="Go to Dashboard" color="gray" on:click={() => goto('/')}>

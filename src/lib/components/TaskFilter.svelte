@@ -19,30 +19,37 @@
 	}
 </script>
 
-<div
-	class="flex items-center gap-3 rounded-lg bg-gray-50 p-3 shadow-sm"
-	role="search"
-	aria-label="Task filter"
->
+<div class="flex h-10 flex-shrink-0 items-center gap-3 p-0" role="search" aria-label="Task filter">
 	<label class="sr-only" for="status-filter">Filter by status</label>
-	<select
-		id="status-filter"
-		class="rounded border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-		on:change={updateStatus}
-		bind:value={status}
-	>
-		<option value="">All</option>
-		<option value="todo">Todo</option>
-		<option value="in-progress">In Progress</option>
-		<option value="done">Done</option>
-	</select>
-
+	<div class="relative h-full">
+		<select
+			id="status-filter"
+			class="h-full appearance-none rounded border-gray-300 bg-black/30 px-2 py-1 pr-8 text-sm text-white focus:border-blue-500 focus:ring focus:ring-blue-200"
+			on:change={updateStatus}
+			bind:value={status}
+		>
+			<option value="">All</option>
+			<option value="todo">Todo</option>
+			<option value="in-progress">In Progress</option>
+			<option value="done">Done</option>
+		</select>
+		<svg
+			class="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 text-white"
+			fill="none"
+			stroke="white"
+			viewBox="0 0 24 24"
+		>
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+		</svg>
+	</div>
+	<!-- Custom arrow -->
 	<label class="sr-only" for="task-search">Search tasks</label>
 	<input
 		id="task-search"
 		type="search"
+		autocomplete="off"
 		placeholder="Search tasks..."
-		class="flex-1 rounded border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+		class="h-full flex-1 rounded border border-gray-300 bg-black/30 px-2 py-1 text-sm text-white focus:border-blue-600 focus:ring focus:ring-blue-200"
 		on:input={updateQuery}
 		bind:value={q}
 	/>

@@ -23,18 +23,24 @@
 	function formatLabel(label: ColumnLabel): string {
 		return label.replace('-', ' ');
 	}
+
+	const colorClasses: Record<ColumnLabel, string> = {
+		todo: 'bg-red-200',
+		'in-progress': 'bg-blue-200',
+		done: 'bg-green-200'
+	};
 </script>
 
 <div
-	class="flex min-h-[300px] flex-col overflow-auto rounded-lg border border-gray-300 bg-gray-100 p-4 shadow"
+	class={`flex min-h-[300px] flex-col overflow-auto rounded-lg border border-gray-300 p-4 ${colorClasses[col]}`}
 	on:dragover|preventDefault
 	on:drop={handleDrop}
 	role="list"
 	aria-label={`Tasks in ${formatLabel(col)} column`}
 >
-	<h2 class="mb-2 font-semibold capitalize">
+	<h3 class="mb-2 font-semibold capitalize">
 		{formatLabel(col)}
-	</h2>
+	</h3>
 
 	<div class="flex-1 space-y-2">
 		{#each tasks.filter((t) => t.status === col) as t (t.id)}

@@ -57,36 +57,36 @@
 	});
 </script>
 
-<div class="flex h-screen flex-col space-y-6 p-6">
-	<div class="flex flex-wrap items-center justify-between gap-4">
-		<h1 class="text-2xl font-bold">Dashboard</h1>
-		<div class="flex items-center gap-4">
+<div class="flex h-screen flex-col space-y-6">
+	<div class="flex flex-wrap items-center justify-between gap-4 bg-black/70 p-6 backdrop-blur">
+		<h1 class="text-2xl font-bold text-white">Dashboard</h1>
+		<div class="flex flex-wrap items-center gap-4">
 			<TaskFilter
 				bind:status={$filter.status as ColumnLabel}
 				bind:q={$filter.q}
 				on:change={handleFilterChange}
 			/>
-			<div class="flex items-center gap-2">
+			<div class="flex flex-shrink-0 items-center gap-2">
 				<Button label="Add Task" color="blue" on:click={() => handleClick('Add Task')}>
 					<Plus class="h-5 w-5" />
 				</Button>
 				<Button color="green" on:click={() => handleClick('List')}><List class="h-5 w-5" /></Button>
-				<Button color="red" on:click={() => handleClick('Kanban')}
-					><LayoutKanban class="h-5 w-5" /></Button
-				>
+				<Button color="red" on:click={() => handleClick('Kanban')}>
+					<LayoutKanban class="h-5 w-5" />
+				</Button>
 			</div>
 		</div>
 	</div>
 
 	{#if $nearest}
-		<div class="mt-4 rounded-xl bg-yellow-100 p-4 shadow">
+		<div class="m-4 rounded-xl bg-yellow-100 p-4">
 			<h2 class="font-semibold">Nearest deadline:</h2>
 			<p>{$nearest.title} (due {$nearest.due_date})</p>
 		</div>
 	{/if}
 
 	{#if $viewMode === 'list'}
-		<div class="mt-4 grid gap-4">
+		<div class="m-4 grid gap-4">
 			{#each $tasks as t}
 				<div class="rounded border border-gray-200 bg-white p-4 shadow">
 					<a href={`/task/${t.id}`} class="font-semibold">{t.title}</a>
@@ -97,7 +97,7 @@
 			{/each}
 		</div>
 	{:else}
-		<div class="mt-4 flex-1">
+		<div class="m-4 flex-1">
 			<div class="grid h-full grid-cols-1 gap-4 md:grid-cols-3">
 				{#each ['todo', 'in-progress', 'done'] as colTyped}
 					<Column

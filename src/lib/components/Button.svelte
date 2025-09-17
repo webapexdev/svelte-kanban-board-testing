@@ -17,7 +17,7 @@
 		blue: 'bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500',
 		green: 'bg-green-500 hover:bg-green-600 text-white focus:ring-green-500',
 		red: 'bg-red-500 hover:bg-red-600 text-white focus:ring-red-500',
-		gray: 'bg-gray-200 hover:bg-gray-300 text-black focus:ring-gray-500'
+		gray: 'bg-gray-400 hover:bg-gray-500 hover:text-white text-black focus:ring-gray-600'
 	};
 
 	const baseClasses =
