@@ -1,5 +1,5 @@
 import { test, expect, vi } from 'vitest';
-import { render } from 'vitest-browser-svelte';
+import { render, fireEvent } from 'vitest-browser-svelte';
 import TaskForm from '$lib/components/TaskForm.svelte';
 import { page } from '@vitest/browser/context';
 
@@ -18,13 +18,22 @@ test('renders form fields and save button', () => {
     expect(container.querySelector('textarea[placeholder="Description"]')).toBeTruthy();
     expect(container.querySelector('input[type="date"]')).toBeTruthy();
 
-    const saveBtn = container.querySelector('button');
-    expect(saveBtn?.textContent).toContain('Save');
+    const saveBtnList = container.querySelectorAll('button');
+    expect(saveBtnList[0].textContent).toContain('Upload Image'); // first button is file upload
+    expect(saveBtnList[1].textContent).toContain('Save');
 });
 
-test('shows validation error markup if title is empty', () => {
-    const { container } = render(TaskForm, { mode: 'edit', title: '', description: '' });
-    // Pretend validation already ran → error message placeholder should exist after submit
+test('shows validation error if title is empty on submit', async () => {
+    const { getByTestId, container } = render(TaskForm, { mode: 'new' });
+
+    // Click Save button
+    const saveBtn = getByTestId('save-btn');
+    expect(saveBtn).toBeTruthy();
+
+    // Trigger Svelte's click manually
+    saveBtn?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    // Now the error should appear
     expect(container.innerHTML).toContain('text-red-500');
 });
 

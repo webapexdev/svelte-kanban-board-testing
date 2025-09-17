@@ -107,7 +107,7 @@
 			{#if mode === 'edit'}
 				<Button label="Cancel" color="gray" on:click={oncancel} />
 			{/if}
-			<Button label="Save" color="blue" on:click={submit}>
+			<Button data-testid="save-btn" label="Save" color="blue" on:click={submit}>
 				<Save class="h-5 w-5" />
 			</Button>
 		</div>
